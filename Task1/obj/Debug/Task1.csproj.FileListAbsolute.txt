@@ -1,0 +1,7 @@
+C:\Users\pande\Desktop\IACSD_assingment\MS.NET\programs\Task1\bin\Debug\Task1.exe.config
+C:\Users\pande\Desktop\IACSD_assingment\MS.NET\programs\Task1\bin\Debug\Task1.exe
+C:\Users\pande\Desktop\IACSD_assingment\MS.NET\programs\Task1\bin\Debug\Task1.pdb
+C:\Users\pande\Desktop\IACSD_assingment\MS.NET\programs\Task1\obj\Debug\Task1.csproj.AssemblyReference.cache
+C:\Users\pande\Desktop\IACSD_assingment\MS.NET\programs\Task1\obj\Debug\Task1.csproj.CoreCompileInputs.cache
+C:\Users\pande\Desktop\IACSD_assingment\MS.NET\programs\Task1\obj\Debug\Task1.exe
+C:\Users\pande\Desktop\IACSD_assingment\MS.NET\programs\Task1\obj\Debug\Task1.pdb
