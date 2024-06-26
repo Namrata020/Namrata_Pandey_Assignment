@@ -1,4 +1,4 @@
-﻿using EmployeeManagementSystem.Common;
+using EmployeeManagementSystem.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Linq;
@@ -12,37 +12,49 @@ namespace EmployeeManagementSystem.ServiceFilter
     {
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+            //BASIC
             var basicParam = context.ActionArguments.SingleOrDefault(p => p.Value is BasicEmployeeFilterCriteria);
-            if (basicParam.Value != null)
+            if (basicParam.Value == null)
             {
-                BasicEmployeeFilterCriteria basicFilterCriteria = (BasicEmployeeFilterCriteria)basicParam.Value;
-                AddStatusFilterIfNeeded(basicFilterCriteria.Filters);
-                basicFilterCriteria.Filters.RemoveAll(e => string.IsNullOrEmpty(e.FieldName));
+                context.Result = new BadRequestObjectResult("Object is null");
+                return;
             }
 
+            BasicEmployeeFilterCriteria basicFilterCriteria = (BasicEmployeeFilterCriteria)basicParam.Value;
+            var basicStatusFilter = basicFilterCriteria.Filters.Find(e => e.FieldName == "status");
+            if (basicStatusFilter == null)
+            {
+                basicStatusFilter = new FilterCriteria();
+                basicStatusFilter.FieldName = "status";
+                basicStatusFilter.FieldValue = "Active";
+                basicFilterCriteria.Filters.Add(basicStatusFilter);
+            }
+
+            basicFilterCriteria.Filters.RemoveAll(e => string.IsNullOrEmpty(e.FieldName));
+
+            //ADDITIONAL
             var additionalParam = context.ActionArguments.SingleOrDefault(p => p.Value is AdditionalEmployeeFilterCriteria);
-            if (additionalParam.Value != null)
+            if (additionalParam.Value == null)
             {
-                AdditionalEmployeeFilterCriteria additionalFilterCriteria = (AdditionalEmployeeFilterCriteria)additionalParam.Value;
-                AddStatusFilterIfNeeded(additionalFilterCriteria.Filters);
-                additionalFilterCriteria.Filters.RemoveAll(e => string.IsNullOrEmpty(e.FieldName));
+                context.Result = new BadRequestObjectResult("Object is null");
+                return;
             }
 
-            await next();
+            AdditionalEmployeeFilterCriteria additionalFilterCriteria = (AdditionalEmployeeFilterCriteria)additionalParam.Value;
+            var additionalStatusFilter = additionalFilterCriteria.Filters.Find(e => e.FieldName == "status");
+            if (additionalStatusFilter == null)
+            {
+                additionalStatusFilter = new FilterCriteria();
+                additionalStatusFilter.FieldName = "status";
+                additionalStatusFilter.FieldValue = "Active";
+                additionalFilterCriteria.Filters.Add(additionalStatusFilter);
+            }
+
+            additionalFilterCriteria.Filters.RemoveAll(e => string.IsNullOrEmpty(e.FieldName));
+
+            var result = await next();
+            
         }
 
-        private void AddStatusFilterIfNeeded(IList<FilterCriteria> filters)
-        {
-            var statusFilter = filters.FirstOrDefault(e => e.FieldName == "status");
-            if (statusFilter == null)
-            {
-                statusFilter = new FilterCriteria
-                {
-                    FieldName = "status",
-                    FieldValue = "Active"
-                };
-                filters.Add(statusFilter);
-            }
-        }
     }
 }
