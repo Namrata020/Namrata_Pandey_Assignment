@@ -1,4 +1,4 @@
-﻿using EmployeeManagementSystem.Common;
+using EmployeeManagementSystem.Common;
 using EmployeeManagementSystem.DTO;
 using EmployeeManagementSystem.Entities;
 using EmployeeManagementSystem.Interface;
@@ -134,14 +134,14 @@ namespace EmployeeManagementSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> Export()
         {
-            var employeesBasic = await _employeeBasicDetailsService.GetAllEmployeeBasicDetails();
+            var basicDetails = await _employeeBasicDetailsService.GetAllEmployeeBasicDetails();
             var additionalDetails = await _employeeAdditionalDetailsService.GetAllEmployeeAdditionalDetails();
 
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
 
             using (var package = new ExcelPackage())
             {
-                var worksheet = package.Workbook.Worksheets.Add("employeesBasic");
+                var worksheet = package.Workbook.Worksheets.Add("basicDetails");
 
                 //Add header
                 worksheet.Cells[1, 1].Value = "Sr.No.";
@@ -172,12 +172,13 @@ namespace EmployeeManagementSystem.Controllers
                     range.Style.Font.Bold = true;
                     range.Style.Fill.PatternType = ExcelFillStyle.Solid;
                     range.Style.Fill.BackgroundColor.SetColor(Color.Purple);
+                    range.Style.Font.Color.SetColor(Color.Black);
                 }
 
                 //Add data
-                for (int i = 0; i < employeesBasic.Count; i++)
+                for (int i = 0; i < basicDetails.Count; i++)
                 {
-                    var employee = employeesBasic[i];
+                    var employee = basicDetails[i];
                     var additionalDetail = additionalDetails.FirstOrDefault(ad => ad.EmployeeBasicDetailsUId == employee.UId);
 
                     worksheet.Cells[i + 2, 1].Value = i + 1;
@@ -194,14 +195,17 @@ namespace EmployeeManagementSystem.Controllers
                     worksheet.Cells[i + 2, 12].Value = employee.ReportingManagerName;
                     worksheet.Cells[i + 2, 13].Value = employee.Address;
                     worksheet.Cells[i + 2, 14].Value = employee.Status;
-                    worksheet.Cells[i + 2, 15].Value = additionalDetail.EmployeeBasicDetailsUId;
-                    worksheet.Cells[i + 2, 16].Value = additionalDetail.AlternateEmail;
-                    worksheet.Cells[i + 2, 17].Value = additionalDetail.AlternateMobile;
-                    worksheet.Cells[i + 2, 18].Value = additionalDetail.WorkInformation;
-                    worksheet.Cells[i + 2, 19].Value = additionalDetail.PersonalDetails;
-                    worksheet.Cells[i + 2, 20].Value = additionalDetail.IdentityInformation;
-                    worksheet.Cells[i + 2, 21].Value = additionalDetail.Status;
-                    //worksheet.Cells[i + 2, 8].Value = additionalDetail?.WorkInformation?.DateOfJoining.ToString("yyyy-MM-dd");
+
+                    if(additionalDetail != null)
+                    {
+                        worksheet.Cells[i + 2, 15].Value = additionalDetail.EmployeeBasicDetailsUId;
+                        worksheet.Cells[i + 2, 16].Value = additionalDetail.AlternateEmail;
+                        worksheet.Cells[i + 2, 17].Value = additionalDetail.AlternateMobile;
+                        worksheet.Cells[i + 2, 18].Value = additionalDetail.WorkInformation;
+                        worksheet.Cells[i + 2, 19].Value = additionalDetail.PersonalDetails;
+                        worksheet.Cells[i + 2, 20].Value = additionalDetail.IdentityInformation;
+                        worksheet.Cells[i + 2, 21].Value = additionalDetail.Status;
+                    }
                 }
             
 
@@ -237,22 +241,6 @@ namespace EmployeeManagementSystem.Controllers
             var response = await _employeeBasicDetailsService.AddEmployeeBasicDetailsByMakepostRequest(employeeBasicDetailsDto);
             return Ok(response);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     }
 
